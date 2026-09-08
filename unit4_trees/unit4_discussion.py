@@ -17,14 +17,16 @@ class Node:
         # TODO (Student):
         # Store the node's value and initialize references
         # to the left and right child nodes.
-        pass
+        self.value = value
+        self.left = None
+        self.right = None
 
 
 class BST:
     def __init__(self):
         # TODO (Student):
         # Initialize an empty Binary Search Tree.
-        pass
+        self.root = None
 
     def insert(self, value):
         """
@@ -37,7 +39,7 @@ class BST:
           whether a value is smaller or larger than the
           current node.
         """
-        pass
+        self.root = self._insert_recursive(self.root, value)
 
     def _insert_recursive(self, node, value):
         """
@@ -50,7 +52,16 @@ class BST:
         - Insert larger values into the right subtree.
         - Return the updated node reference.
         """
-        pass
+        if node is None:
+            return Node(value)
+
+        # The ordering rule determines which subtree can hold the value.
+        if value < node.value:
+            node.left = self._insert_recursive(node.left, value)
+        elif value > node.value:
+            node.right = self._insert_recursive(node.right, value)
+
+        return node
 
     def search(self, value):
         """
@@ -63,14 +74,22 @@ class BST:
         - Add comments explaining why BST search is often
           more efficient than linear search.
         """
-        pass
+        return self._search_recursive(self.root, value)
 
     def _search_recursive(self, node, value):
         """
         TODO (Student):
         Implement recursive BST search.
         """
-        pass
+        if node is None:
+            return False
+        if value == node.value:
+            return True
+
+        # Each comparison eliminates the subtree that cannot contain the value.
+        if value < node.value:
+            return self._search_recursive(node.left, value)
+        return self._search_recursive(node.right, value)
 
     def inorder(self):
         """
@@ -78,7 +97,9 @@ class BST:
         Return a list containing the values from an
         in-order traversal.
         """
-        pass
+        values = []
+        self._inorder_recursive(self.root, values)
+        return values
 
     def _inorder_recursive(self, node, values):
         """
@@ -92,7 +113,13 @@ class BST:
         - Add comments explaining why this traversal
           produces sorted output in a BST.
         """
-        pass
+        if node is None:
+            return
+
+        # Left, node, right visits BST values from smallest to largest.
+        self._inorder_recursive(node.left, values)
+        values.append(node.value)
+        self._inorder_recursive(node.right, values)
 
 
 def main():
@@ -110,8 +137,16 @@ def main():
     # 4. Display the values inserted.
     # 5. Use comments to explain why a BST is efficient at reducing search space for each step.
 
-    print("\n=== TREE CONSTRUCTION ===")
-    print("TODO: Create a BST and insert multiple values.")
+    print("\n=== MANUSCRIPT CATALOG CONSTRUCTION ===")
+    manuscript_ids = [5000, 2500, 7500, 1250, 3750, 6250,
+                      8750, 3125, 4375, 6875, 8125]
+    catalog = BST()
+    for manuscript_id in manuscript_ids:
+        catalog.insert(manuscript_id)
+
+    print(f"Inserted manuscript IDs: {manuscript_ids}")
+    print("Smaller IDs were placed left; larger IDs were placed right.")
+    print("A balanced shape lets each comparison discard one subtree.")
 
     # ===============================
     # TODO (Student): IN-ORDER TRAVERSAL
@@ -124,7 +159,8 @@ def main():
     #    sorted output in a BST.
 
     print("\n=== IN-ORDER TRAVERSAL ===")
-    print("TODO: Display and explain traversal results.")
+    print(f"Sorted manuscript IDs: {catalog.inorder()}")
+    print("Left-node-right traversal produces ascending output.")
 
     # ===============================
     # TODO (Student): SEARCH TESTS
@@ -136,7 +172,10 @@ def main():
     # 3. Use comments to clearly explain the results.
 
     print("\n=== SEARCH TESTS ===")
-    print("TODO: Demonstrate BST searching.")
+    for manuscript_id in [4375, 8125, 3000, 9000]:
+        print(f"Contains manuscript ID {manuscript_id}: "
+              f"{catalog.search(manuscript_id)}")
+    print("Each search follows only the possible left or right subtree.")
 
     # ===============================
     # TODO (Student): EDGE CASES
@@ -153,8 +192,19 @@ def main():
     # Use comments to explain what happens and why.
 
     print("\n=== EDGE CASES ===")
-    print("TODO: Demonstrate and explain an edge case.")
+    empty_catalog = BST()
+    print(f"Empty traversal: {empty_catalog.inorder()}")
+    print(f"Search empty catalog for 5000: {empty_catalog.search(5000)}")
 
+    before_duplicate = catalog.inorder()
+    catalog.insert(5000)
+    print(f"Duplicate 5000 ignored: {catalog.inorder() == before_duplicate}")
+
+    single_catalog = BST()
+    single_catalog.insert(9001)
+    print(f"Single-node traversal: {single_catalog.inorder()}")
+    print("Empty operations return safe results, duplicates remain unique, "
+          "and a one-node tree still works.")
 
 
 if __name__ == "__main__":
